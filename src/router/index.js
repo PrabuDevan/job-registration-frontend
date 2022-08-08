@@ -5,6 +5,8 @@ import AdminView from '../views/AdminView.vue'
 import ViewApplicants from '../views/ViewApplicants.vue'
 import AppLogin from '../views/AppLogin.vue'
 import CreateUpdateApplicant from '../components/CreateUpdateApplicant.vue'
+import ViewUser from '../components/ViewUser.vue'
+import store from '@/store'
 
 Vue.use(VueRouter)
 
@@ -20,6 +22,14 @@ const routes = [
     component: AppLogin
   },
   {
+    path: '/profile',
+    name: 'Profile',
+    component: ViewUser,
+    meta: {
+      authRequired: true
+    }
+  },
+  {
     path: '/admin',
     component: AdminView,
     redirect: { name: 'ViewApplicants' },
@@ -29,7 +39,9 @@ const routes = [
         name: "ViewApplicants",
         component: ViewApplicants,
         meta: {
-          layout: 'AdminLayout'
+          layout: 'AdminLayout',
+          authRequired: true,
+          shouldBeAdmin: true
         },
       },
       {
@@ -37,7 +49,9 @@ const routes = [
         name: "EditApplicant",
         component: CreateUpdateApplicant,
         meta: {
-          layout: 'AdminLayout'
+          layout: 'AdminLayout',
+          authRequired: true,
+          shouldBeAdmin: true
         },
       },
       {
@@ -45,25 +59,38 @@ const routes = [
         name: "AddApplicant",
         component: CreateUpdateApplicant,
         meta: {
-          layout: 'AdminLayout'
+          layout: 'AdminLayout',
+          authRequired: true,
+          shouldBeAdmin: true
         },
       }
     ]
-  },
-  {
-    path: '/about',
-    name: 'about',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: function () {
-      return import(/* webpackChunkName: "about" */ '../views/AboutView.vue')
-    }
   }
 ]
 
 const router = new VueRouter({
   routes
 })
+
+router.beforeEach((to, from, next) => {
+  const authRequired = to.meta?.authRequired;
+  const shouldBeAdmin = to.meta?.shouldBeAdmin;
+  const loggedIn = store.getters.isLoggedIn;
+  const isAdmin = store.getters.isAdmin;
+  // redirect to login page if user is not logged in and trying to access a restricted page
+  if (authRequired && !loggedIn) {
+      return next('/login');
+  }
+  // redirect to home page if user is logged in and trying to access login page
+  if (loggedIn && !authRequired) {
+      return next('/profile');
+  }
+  // user shouldn't access admin routes
+  if (loggedIn && shouldBeAdmin && !isAdmin) {
+    return next('/profile')
+  }
+  next();
+})
+
 
 export default router

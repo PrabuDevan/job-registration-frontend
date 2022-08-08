@@ -20,7 +20,7 @@
       <v-list-item :to="{ name: 'AddApplicant' }" class="px-2 text-center">
         <v-list-item-title>Add Applicant</v-list-item-title>
       </v-list-item>
-      <v-list-item class="px-2 text-center">
+      <v-list-item @click="$store.dispatch('LOGOUT')" class="px-2 text-center">
         <v-list-item-title>Logout</v-list-item-title>
       </v-list-item>
 

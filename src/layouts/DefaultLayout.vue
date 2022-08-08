@@ -7,6 +7,10 @@
       </div>
 
       <v-spacer></v-spacer>
+
+      <v-btn @click="$router.push('/login')" v-if="!isLoggedIn" text class="text-none">Login</v-btn>
+      <v-btn @click="$router.push('/')" v-if="!isLoggedIn" text class="text-none">Register</v-btn>
+      <v-btn @click="$store.dispatch('LOGOUT')" v-if="isLoggedIn" text class="text-none">Logout</v-btn>
     </v-app-bar>
 
     <v-main>
@@ -18,6 +22,11 @@
 <script>
 
 export default {
-  name: 'DefaultLayout'
+  name: 'DefaultLayout',
+  computed: {
+    isLoggedIn() {
+      return this.$store.getters.isLoggedIn
+    }
+  }
 };
 </script>

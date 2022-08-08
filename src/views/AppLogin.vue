@@ -59,12 +59,13 @@ export default {
           .then((res) => {
             setToken(res.data.token);
             axios.defaults.headers.common["Authorization"] = `Bearer ${res.data.token}`;
-            this.$store.dispatch("GET_CURRENT_USER");
-            if (res.data.isAdmin) {
-              this.$router.push("/admin");
-            } else {
-              this.$router.push("/user");
-            }
+            this.$store.dispatch("GET_CURRENT_USER").then(() => {
+              if (res.data.isAdmin) {
+                this.$router.push("/admin");
+              } else {
+                this.$router.push("/profile");
+              }
+            })
           });
       }
     },
